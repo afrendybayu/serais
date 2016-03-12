@@ -38,12 +38,15 @@ int main(int argc, char *argv[])
     //*/
 
     serialPort.setPortName("/dev/tnt0");
-    //serialPort.setBaudRate(9600);
-    if (!serialPort.open(QIODevice::ReadOnly)) {
+    //serialPort.setBaudRate(QSerialPort::Baud9600, QSerialPort::Input);
+
+    qDebug() << "mau buka serial" << endl;
+    if (!serialPort.open(QIODevice::ReadOnly)) {        //  | QIODevice::Unbuffered
         standardOutput << QObject::tr("Failed to open port tnt0, error: %1").arg(serialPort.errorString()) << endl;
         return 1;
     }
 
+    qDebug() << "berhasil buka serial /dev/tnt0" << endl;
     SerialPortReader serialPortReader(&serialPort);
 
     return coreApplication.exec();

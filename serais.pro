@@ -1,5 +1,6 @@
 QT = core
 QT += serialport
+QT += network
 
 CONFIG += console
 CONFIG -= app_bundle
