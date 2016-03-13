@@ -9,11 +9,13 @@ TARGET = serais
 TEMPLATE = app
 
 HEADERS += \
-    serialportreader.h
+    serialportreader.h \
+    log.h
 
 SOURCES += \
     main.cpp \
-    serialportreader.cpp
+    serialportreader.cpp \
+    log.cpp
 
 OTHER_FILES += \
     setting.ini

@@ -4,7 +4,6 @@
 
 #include <QtSerialPort/QSerialPort>
 
-#include <QTextStream>
 #include <QTimer>
 #include <QByteArray>
 #include <QObject>
@@ -12,6 +11,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrl>
+#include <QFile>
+#include <QTextStream>
 #include <QUrlQuery>
 
 
