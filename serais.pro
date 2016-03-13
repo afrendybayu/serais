@@ -14,3 +14,6 @@ HEADERS += \
 SOURCES += \
     main.cpp \
     serialportreader.cpp
+
+OTHER_FILES += \
+    setting.ini

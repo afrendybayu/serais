@@ -17,28 +17,30 @@
 
 QT_USE_NAMESPACE
 
-
-class SerialPortReader : public QObject
-{
+class SerialPortReader : public QObject {
     Q_OBJECT
 
 public:
-    SerialPortReader(QSerialPort *serialPort, QObject *parent = 0);
+    SerialPortReader(QSerialPort *serialPort, QString url, QObject *parent = 0);
     ~SerialPortReader();
 
 private slots:
     void handleReadyRead();
     void handleTimeout();
     void handleError(QSerialPort::SerialPortError error);
-    void sendRequest();
     void handleResponsePost(QNetworkReply *);
+
 
 private:
     QSerialPort *m_serialPort;
     QByteArray  m_readData;
     QTextStream m_standardOutput;
     QTimer      m_timer;
-    QNetworkAccessManager *nm;
+    QString     m_url;
+
+    //QNetworkAccessManager *nm;      // definisi disini supaya no memory leakage
+
+    void sendRequest();
 };
 
 #endif

@@ -4,7 +4,7 @@
 
 QT_USE_NAMESPACE
 
-SerialPortReader::SerialPortReader(QSerialPort *serialPort, QObject *parent)
+SerialPortReader::SerialPortReader(QSerialPort *serialPort, QString url, QObject *parent)
     : QObject(parent)
     , m_serialPort(serialPort)
     , m_standardOutput(stdout)
@@ -13,9 +13,8 @@ SerialPortReader::SerialPortReader(QSerialPort *serialPort, QObject *parent)
     connect(m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(handleError(QSerialPort::SerialPortError)));
     connect(&m_timer, SIGNAL(timeout()), SLOT(handleTimeout()));
 
-    // gak bisa klo bikin signal slot network disini !!
-    //connect(nm, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleResponsePost(QNetworkReply*)));
-    m_timer.start(5000);
+    m_url = url;
+    m_timer.start(1000);
 }
 
 SerialPortReader::~SerialPortReader()   {
@@ -30,39 +29,48 @@ void SerialPortReader::handleReadyRead()    {
         m_timer.start(5000);
 }
 
+// dipakai untuk asyncronous request
 void SerialPortReader::handleResponsePost(QNetworkReply *res) {
-    qDebug() << "handleResponsePost Success" << res->readAll();
+    if (res->error() == QNetworkReply::NoError) {
+        //success
+        qDebug() << "handleResponsePost Success" << res->readAll();
+        //delete reply;
+    }
+
 }
 
+// QNetworkRequest pakai cara syncrounous, hati2 dengan growing thread
 void SerialPortReader::sendRequest()  {
-    QEventLoop eventLoop;
-    QNetworkRequest request = QNetworkRequest(QUrl("http://localhost/ais/post.php"));
+    QEventLoop ev;
+    //QNetworkRequest request = QNetworkRequest(QUrl("http://localhost/ais/post.php"));
+    QNetworkRequest request = QNetworkRequest(QUrl(m_url));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray postDatax;
     postDatax.append("string=");
     postDatax.append(m_readData);
 
-    //*
-    //QNetworkAccessManager *nm = new QNetworkAccessManager(this);
-    //connect(nm, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleResponsePost(QNetworkReply*)));
+    QNetworkAccessManager nm;// = new QNetworkAccessManager(this);
+    connect(&nm, SIGNAL(finished(QNetworkReply*)), &ev, SLOT(quit()));
 
-    if(!m_readData.isEmpty())    {
-        nm->post(request, postDatax);
-    }
-    else {
+    if(m_readData.isEmpty())    {
         qDebug() << "tidak ada data";
+        return;
     }
 
-    //eventLoop.exec(); // blocks stack until "finished()" has been called
+    QNetworkReply *reply = nm.post(request, postDatax);
+    ev.exec(); // blocks stack until "finished()" has been called
 
-    /*
     if (reply->error() == QNetworkReply::NoError) {
-        //success
         qDebug() << "Success" <<reply->readAll();
-        delete reply;
     }
-    //*/
+    else {      //failure
+        qDebug() << "Failure" <<reply->errorString();
+    }
+
+    //delete nm;
+    delete reply;
+    //qDebug() << "selesai";
 }
 
 void SerialPortReader::handleTimeout()  {
