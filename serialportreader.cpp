@@ -23,7 +23,10 @@ SerialPortReader::~SerialPortReader()   {
 }
 
 void SerialPortReader::handleReadyRead()    {
-    m_readData.append(m_serialPort->readAll());
+    QByteArray ba = m_serialPort->readAll();
+    ba.replace(QByteArray("\r"), QByteArray(""));
+    ba.replace(QByteArray("\n"), QByteArray(""));
+    m_readData.append(ba);
 
     if (!m_timer.isActive())
         m_timer.start(5000);
@@ -48,7 +51,8 @@ void SerialPortReader::sendRequest()  {
 
     QByteArray postDatax;
     postDatax.append("string=");
-    postDatax.append(m_readData);
+    postDatax.append(m_readData.toBase64());
+    //postDatax.append(m_readData);
 
     QNetworkAccessManager nm;// = new QNetworkAccessManager(this);
     connect(&nm, SIGNAL(finished(QNetworkReply*)), &ev, SLOT(quit()));
