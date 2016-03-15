@@ -38,6 +38,8 @@ private:
     QTextStream m_standardOutput;
     QTimer      m_timer;
     QString     m_url;
+    ushort      m_postU;
+    QString     m_msgU;
 
     //QNetworkAccessManager *nm;      // definisi disini supaya no memory leakage
 

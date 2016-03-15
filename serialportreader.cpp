@@ -47,12 +47,35 @@ void SerialPortReader::sendRequest()  {
     QEventLoop ev;
     //QNetworkRequest request = QNetworkRequest(QUrl("http://localhost/ais/post.php"));
     QNetworkRequest request = QNetworkRequest(QUrl(m_url));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    //request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    QByteArray postDatax;
+    /*
+    request.setRawHeader("User-Agent", "My app name v0.1");
+    request.setRawHeader("X-Custom-User-Agent", "My app name v0.1");
+    request.setRawHeader("Content-Type", "application/json");
+    request.setRawHeader("Content-Length", postDataSize);
+    //*/
+
+    /*
     postDatax.append("string=");
     postDatax.append(m_readData.toBase64());
-    //postDatax.append(m_readData);
+    //*/
+    m_postU = 0;
+
+    //QString jsonStr = "{\"ais\":\""+m_readData.toBase64()+"\",\"postU\":\""+m_postU+"\"}";
+    QString jsonStr = "{\"ais\":\""+m_readData.toBase64()+"\",\"postU\":\""+QString::number(m_postU)+"\"}";
+    //QByteArray jsonStr;// = "{\"method\":\"AuthenticatePlain\",\"loginName\":\"username@domain.com\",\"password\":\"mypass\"}";
+    QByteArray jsonBA;
+    jsonBA.append(jsonStr);
+
+    QByteArray postDataSize = QByteArray::number(jsonBA.size());
+    qDebug() << "isi json: " << jsonStr;
+
+    // For your "Content-Length" header
+    request.setHeader(QNetworkRequest::UserAgentHeader,"ABAdhy");
+    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+    request.setHeader(QNetworkRequest::ContentLengthHeader, postDataSize);
+
 
     QNetworkAccessManager nm;// = new QNetworkAccessManager(this);
     connect(&nm, SIGNAL(finished(QNetworkReply*)), &ev, SLOT(quit()));
@@ -62,7 +85,7 @@ void SerialPortReader::sendRequest()  {
         return;
     }
 
-    QNetworkReply *reply = nm.post(request, postDatax);
+    QNetworkReply *reply = nm.post(request, jsonBA);
     ev.exec(); // blocks stack until "finished()" has been called
 
     if (reply->error() == QNetworkReply::NoError) {
