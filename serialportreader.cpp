@@ -49,27 +49,14 @@ void SerialPortReader::sendRequest()  {
     QNetworkRequest request = QNetworkRequest(QUrl(m_url));
     //request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    /*
-    request.setRawHeader("User-Agent", "My app name v0.1");
-    request.setRawHeader("X-Custom-User-Agent", "My app name v0.1");
-    request.setRawHeader("Content-Type", "application/json");
-    request.setRawHeader("Content-Length", postDataSize);
-    //*/
-
-    /*
-    postDatax.append("string=");
-    postDatax.append(m_readData.toBase64());
-    //*/
     m_postU = 0;
 
-    //QString jsonStr = "{\"ais\":\""+m_readData.toBase64()+"\",\"postU\":\""+m_postU+"\"}";
     QString jsonStr = "{\"ais\":\""+m_readData.toBase64()+"\",\"postU\":\""+QString::number(m_postU)+"\"}";
-    //QByteArray jsonStr;// = "{\"method\":\"AuthenticatePlain\",\"loginName\":\"username@domain.com\",\"password\":\"mypass\"}";
     QByteArray jsonBA;
     jsonBA.append(jsonStr);
 
     QByteArray postDataSize = QByteArray::number(jsonBA.size());
-    qDebug() << "isi json: " << jsonStr;
+    //qDebug() << "isi json: " << jsonStr;
 
     // For your "Content-Length" header
     request.setHeader(QNetworkRequest::UserAgentHeader,"ABAdhy");
@@ -105,7 +92,7 @@ void SerialPortReader::handleTimeout()  {
         //m_standardOutput << QObject::tr("No data was currently available for reading from port %1").arg(m_serialPort->portName()) << endl;
     } else {
         //m_standardOutput << QObject::tr("Data successfully received from port %1").arg(m_serialPort->portName()) << endl;
-        m_standardOutput << m_readData << endl;
+        //m_standardOutput << m_readData << endl;
         sendRequest();
         m_readData.clear();
     }
